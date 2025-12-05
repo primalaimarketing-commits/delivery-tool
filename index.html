@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Abuela’s Kitchen – Delivery Confirmation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#6b7280;
+      --border:#d1d5db;
+      --accent:#111827;
+      --accent-soft:#e5e7eb;
+      --danger:#b91c1c;
+      --success:#15803d;
+      --radius:14px;
+      --shadow:0 2px 10px rgba(0,0,0,0.06);
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      justify-content:center;
+    }
+    .app{
+      width:100%;
+      max-width:560px;
+      padding:16px;
+    }
+    h1{
+      font-size:1.35rem;
+      margin:6px 0 14px;
+      text-align:center;
+      letter-spacing:.2px;
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+      margin-bottom:16px;
+    }
+    label{
+      display:block;
+      font-size:.9rem;
+      font-weight:600;
+      margin:0 0 6px;
+    }
+    input, select{
+      width:100%;
+      padding:11px 12px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      font-size:.95rem;
+      background:#fff;
+      margin-bottom:12px;
+    }
+    input:focus, select:focus{
+      outline:none;
+      border-color:#111;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+    }
+    .row > div{flex:1;}
+    .hint{
+      font-size:.75rem;
+      color:var(--muted);
+      margin-top:-8px;
+      margin-bottom:10px;
+    }
+    .signature-box{
+      border:1px solid var(--border);
+      background:#fafafa;
+      border-radius:10px;
+      padding:10px;
+      margin-bottom:12px;
+    }
+    .sig-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:6px;
+    }
+    .sig-title{
+      font-size:.86rem;
+      font-weight:600;
+    }
+    canvas{
+      width:100%;
+      height:150px;
+      background:#fff;
+      border-radius:8px;
+      border:1px dashed #9ca3af;
+      touch-action:none;
+      display:block;
+    }
+    button{
+      border:none;
+      border-radius:10px;
+      padding:11px 14px;
+      font-size:.95rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .btn-primary{
+      width:100%;
+      background:var(--accent);
+      color:#fff;
+    }
+    .btn-soft{
+      background:var(--accent-soft);
+      color:var(--accent);
+    }
+    .btn-pill{
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:.8rem;
+      font-weight:700;
+    }
+    .toolbar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .message{
+      margin-top:8px;
+      font-size:.9rem;
+      font-weight:600;
+    }
+    .message.error{color:var(--danger);}
+    .message.success{color:var(--success);}
+    .log-empty{
+      color:var(--muted);
+      font-size:.9rem;
+      margin:0;
+    }
+    .log-entry{
+      padding:10px 0;
+      border-bottom:1px solid #ececec;
+      font-size:.88rem;
+    }
+    .log-entry:last-child{border-bottom:none;}
+    .log-header{
+      font-weight:800;
+      margin-bottom:2px;
+    }
+    .muted{color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Delivery Confirmation</h1>
+
+    <div class="card">
+      <form id="deliveryForm">
+
+        <div class="row">
+          <div>
+            <label for="driverName">Driver name</label>
+            <input id="driverName" type="text" placeholder="e.g. Liev" required />
+          </div>
+          <div>
+            <label for="date">Date</label>
+            <input id="date" type="date" required />
+          </div>
+        </div>
+
+        <label for="location">Clinic / Location</label>
+        <select id="location" required>
+          <option value="">Select a clinic</option>
+          <option value="Torna">Torna</option>
+          <option value="Armaliss">Armaliss</option>
+          <option value="Prestigious">Prestigious</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Bienestar">Bienestar</option>
+          <option value="Rosquete">Rosquete</option>
+          <option value="Bless">Bless</option>
+        </select>
+
+        <label for="meals">Meals delivered</label>
+        <input id="meals" type="number" min="1" step="1" inputmode="numeric"
+               placeholder="How many meals were delivered?" required />
+
+        <label for="recipientName">Manager / recipient name (dock)</label>
+        <input id="recipientName" type="text"
+               placeholder="Name of person receiving meals" required />
+
+        <div class="signature-box">
+          <div class="sig-header">
+            <div class="sig-title">Dock signature (manager)</div>
+            <button type="button" id="clearSignature" class="btn-soft btn-pill">Clear</button>
+          </div>
+          <canvas id="signaturePad" aria-label="Manager signature pad" role="img"></canvas>
+          <div class="hint">Have the manager sign inside the box.</div>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Delivery</button>
+        <div id="message" class="message"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-weight:800;">Saved Deliveries</div>
+        <div class="toolbar">
+          <button type="button" id="exportCsv" class="btn-soft btn-pill">Export CSV</button>
+          <button type="button" id="clearLog" class="btn-soft btn-pill">Clear log</button>
+        </div>
+      </div>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById("deliveryForm");
+      const driverInput = document.getElementById("driverName");
+      const dateInput = document.getElementById("date");
+      const locationSelect = document.getElementById("location");
+      const mealsInput = document.getElementById("meals");
+      const recipientInput = document.getElementById("recipientName");
+      const messageEl = document.getElementById("message");
+      const logEl = document.getElementById("log");
+      const clearLogBtn = document.getElementById("clearLog");
+      const exportCsvBtn = document.getElementById("exportCsv");
+
+      const canvas = document.getElementById("signaturePad");
+      const clearSignatureBtn = document.getElementById("clearSignature");
+      const ctx = canvas.getContext("2d");
+
+      const STORAGE_KEY = "abuela_delivery_confirmations_v3";
+
+      // =========================
+      // OPTIONAL GOOGLE FORM SYNC
+      // =========================
+      // 1) Create a Google Form with matching fields.
+      // 2) Find your formResponse URL and each entry id.
+      // 3) Paste here. Leave POST URL empty to disable.
+      const GOOGLE_FORM_POST_URL = ""; // e.g. "https://docs.google.com/forms/d/e/.../formResponse"
+      const GOOGLE_FORM_FIELDS = {
+        driver: "",    // e.g. "entry.123"
+        date: "",
+        location: "",
+        meals: "",
+        recipient: "",
+        savedAt: ""
+      };
+
+      // Default date = today
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.value = today;
+
+      // =========================
+      // SIGNATURE PAD (Pointer API)
+      // =========================
+      let drawing = false;
+      let hasSignature = false;
+
+      function resizeCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+
+        // Save current signature image (if any) so we can restore it after resizing.
+        const previousSignatureData = hasSignature ? canvas.toDataURL("image/png") : null;
+
+        // Reset transform to avoid cumulative scaling
+        ctx.setTransform(1,0,0,1,0,0);
+
+        // Resize canvas to match visual size * device pixel ratio
+        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+
+        // Scale drawing operations to map to CSS pixels
+        ctx.scale(ratio, ratio);
+
+        if(previousSignatureData){
+          const img = new Image();
+          img.onload = () => {
+            // Clear and draw the previous signature scaled to the new size
+            ctx.clearRect(0,0,rect.width,rect.height);
+            ctx.drawImage(img, 0, 0, rect.width, rect.height);
+            hasSignature = true;
+          };
+          img.src = previousSignatureData;
+        }else{
+          // No previous signature: clear cleanly
+          clearSignature();
+        }
+      }
+
+      function clearSignature(){
+        const rect = canvas.getBoundingClientRect();
+        ctx.clearRect(0,0,rect.width,rect.height);
+        hasSignature = false;
+      }
+
+      function getPos(e){
+        const rect = canvas.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      }
+
+      function start(e){
+        e.preventDefault();
+        drawing = true;
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      }
+
+      function move(e){
+        if(!drawing) return;
+        e.preventDefault();
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#111827";
+        ctx.stroke();
+        hasSignature = true;
+      }
+
+      function end(e){
+        if(!drawing) return;
+        e.preventDefault();
+        drawing = false;
+      }
+
+      canvas.addEventListener("pointerdown", start);
+      canvas.addEventListener("pointermove", move);
+      canvas.addEventListener("pointerup", end);
+      canvas.addEventListener("pointercancel", end);
+      canvas.addEventListener("pointerleave", end);
+
+      clearSignatureBtn.addEventListener("click", clearSignature);
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      // =========================
+      // STORAGE
+      // =========================
+      function loadDeliveries(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        }catch(err){
+          console.error(err);
+          return [];
+        }
+      }
+
+      function saveDeliveries(list){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }
+
+      function renderLog(){
+        const list = loadDeliveries();
+        if(!list.length){
+          logEl.innerHTML = '<p class="log-empty">No deliveries saved yet.</p>';
+          return;
+        }
+        logEl.innerHTML = list.map(d => `
+          <div class="log-entry">
+            <div class="log-header">${escapeHtml(d.date)} • ${escapeHtml(d.location)}</div>
+            <div>Meals delivered: <strong>${d.meals}</strong></div>
+            <div>Driver: ${escapeHtml(d.driver)}</div>
+            <div>Recipient: ${escapeHtml(d.recipient)}</div>
+            <div class="muted">Saved at ${escapeHtml(d.savedAt)} • Signature: ${d.signature ? "Yes" : "No"}</div>
+          </div>
+        `).join("");
+      }
+
+      function escapeHtml(str){
+        return String(str ?? "")
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll("\"","&quot;")
+          .replaceAll("'","&#039;");
+      }
+
+      // =========================
+      // GOOGLE FORM SEND (optional)
+      // =========================
+      function sendToGoogleForm(delivery){
+        if(!GOOGLE_FORM_POST_URL) return;
+
+        const fd = new FormData();
+        if(GOOGLE_FORM_FIELDS.driver) fd.append(GOOGLE_FORM_FIELDS.driver, delivery.driver);
+        if(GOOGLE_FORM_FIELDS.date) fd.append(GOOGLE_FORM_FIELDS.date, delivery.date);
+        if(GOOGLE_FORM_FIELDS.location) fd.append(GOOGLE_FORM_FIELDS.location, delivery.location);
+        if(GOOGLE_FORM_FIELDS.meals) fd.append(GOOGLE_FORM_FIELDS.meals, String(delivery.meals));
+        if(GOOGLE_FORM_FIELDS.recipient) fd.append(GOOGLE_FORM_FIELDS.recipient, delivery.recipient);
+        if(GOOGLE_FORM_FIELDS.savedAt) fd.append(GOOGLE_FORM_FIELDS.savedAt, delivery.savedAt);
+
+        fetch(GOOGLE_FORM_POST_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: fd
+        }).catch(console.error);
+      }
+
+      // =========================
+      // SUBMIT
+      // =========================
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        messageEl.textContent = "";
+        messageEl.className = "message";
+
+        const driver = driverInput.value.trim();
+        const date = dateInput.value;
+        const location = locationSelect.value;
+        const meals = Number(mealsInput.value);
+        const recipient = recipientInput.value.trim();
+
+        if(!driver || !date || !location || !recipient || !meals || meals <= 0){
+          messageEl.textContent = "Please fill in all fields correctly.";
+          messageEl.classList.add("error");
+          return;
+        }
+
+        if(!hasSignature){
+          messageEl.textContent = "Please capture the manager’s dock signature.";
+          messageEl.classList.add("error");
+          return;
+        }
+
+        const now = new Date();
+        const savedAt = now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+
+        // store signature as data URL for local proof
+        const signature = canvas.toDataURL("image/png");
+
+        const delivery = {
+          driver,
+          date,
+          location,
+          meals,
+          recipient,
+          savedAt,
+          signature
+        };
+
+        const list = loadDeliveries();
+        list.unshift(delivery);
+        saveDeliveries(list);
+        renderLog();
+        sendToGoogleForm(delivery);
+
+        messageEl.textContent = "Delivery saved ✅";
+        messageEl.classList.add("success");
+
+        // Keep driver/date for speed; reset rest
+        mealsInput.value = "";
+        recipientInput.value = "";
+        clearSignature();
+        mealsInput.focus();
+      });
+
+      // =========================
+      // CLEAR LOG
+      // =========================
+      clearLogBtn.addEventListener("click", () => {
+        if(confirm("Clear all saved deliveries from this device?")){ 
+          saveDeliveries([]);
+          renderLog();
+        }
+      });
+
+      // =========================
+      // EXPORT CSV
+      // =========================
+      exportCsvBtn.addEventListener("click", () => {
+        const list = loadDeliveries();
+        if(!list.length){
+          alert("No deliveries to export.");
+          return;
+        }
+
+        const headers = ["Date","TimeSaved","Driver","Location","MealsDelivered","Recipient","HasSignature"];
+        const rows = list.map(d => [
+          d.date,
+          d.savedAt,
+          d.driver,
+          d.location,
+          d.meals,
+          d.recipient,
+          d.signature ? "Yes" : "No"
+        ]);
+
+        const csv = [headers, ...rows]
+          .map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(","))
+          .join("\n");
+
+        const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "deliveries.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+
+      // first render
+      renderLog();
+    })();
+  </script>
+</body>
+</html>
