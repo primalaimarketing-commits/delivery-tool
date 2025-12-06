@@ -18,7 +18,9 @@
       --radius:14px;
       --shadow:0 2px 10px rgba(0,0,0,0.06);
     }
+
     *{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+
     body{
       margin:0;
       background:var(--bg);
@@ -26,17 +28,38 @@
       display:flex;
       justify-content:center;
     }
+
     .app{
       width:100%;
-      max-width:560px;
+      max-width:720px;
       padding:16px;
     }
-    h1{
-      font-size:1.35rem;
-      margin:6px 0 14px;
-      text-align:center;
-      letter-spacing:.2px;
+
+    /* Header: black band with centered logo and title */
+    .header {
+      background: #000;
+      padding: 18px 0;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 12px;
     }
+
+    .logo{
+      max-height:120px;
+      width:auto;
+      display:inline-block;
+      vertical-align:middle;
+    }
+
+    .header h1 {
+      color:#fff;
+      margin-top:8px;
+      margin-bottom:0;
+      font-size:1.35rem;
+      letter-spacing:.2px;
+      font-weight:800;
+    }
+
     .card{
       background:var(--card);
       border-radius:var(--radius);
@@ -44,12 +67,23 @@
       box-shadow:var(--shadow);
       margin-bottom:16px;
     }
+
+    .footer{
+      background:transparent;
+      box-shadow:none;
+      padding:12px 16px;
+      margin-top:6px;
+    }
+    .footer a{ color:var(--accent); text-decoration:none; font-weight:600; }
+    .footer a:hover{ text-decoration:underline; }
+
     label{
       display:block;
       font-size:.9rem;
       font-weight:600;
       margin:0 0 6px;
     }
+
     input, select{
       width:100%;
       padding:11px 12px;
@@ -59,21 +93,38 @@
       background:#fff;
       margin-bottom:12px;
     }
+
     input:focus, select:focus{
       outline:none;
       border-color:#111;
     }
+
     .row{
       display:flex;
       gap:10px;
     }
     .row > div{flex:1;}
+
     .hint{
       font-size:.75rem;
       color:var(--muted);
       margin-top:-8px;
       margin-bottom:10px;
     }
+
+    .small-label{
+      font-size:0.78rem;
+      font-weight:600;
+      margin-bottom:6px
+    }
+
+    .compact-input{
+      padding:8px 10px;
+      border-radius:8px;
+      font-size:0.9rem;
+      margin-bottom:8px;
+    }
+
     .signature-box{
       border:1px solid var(--border);
       background:#fafafa;
@@ -91,6 +142,7 @@
       font-size:.86rem;
       font-weight:600;
     }
+
     canvas{
       width:100%;
       height:150px;
@@ -100,6 +152,7 @@
       touch-action:none;
       display:block;
     }
+
     button{
       border:none;
       border-radius:10px;
@@ -123,12 +176,20 @@
       font-size:.8rem;
       font-weight:700;
     }
+
+    .btn-xs{
+      padding:5px 9px;
+      font-size:.78rem;
+      font-weight:700;
+    }
+
     .toolbar{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
       justify-content:flex-end;
     }
+
     .message{
       margin-top:8px;
       font-size:.9rem;
@@ -136,11 +197,13 @@
     }
     .message.error{color:var(--danger);}
     .message.success{color:var(--success);}
+
     .log-empty{
       color:var(--muted);
       font-size:.9rem;
       margin:0;
     }
+
     .log-entry{
       padding:10px 0;
       border-bottom:1px solid #ececec;
@@ -152,11 +215,60 @@
       margin-bottom:2px;
     }
     .muted{color:var(--muted);}
+
+    .summary-bar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .summary-pill{
+      background:var(--accent-soft);
+      color:var(--accent);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:700;
+      font-size:.82rem;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .signature-preview{
+      display:none;
+      margin-top:8px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      max-width:100%;
+      background:#fff;
+    }
+
+    .log-actions{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+
+    @media (max-width:480px){
+      .logo{max-height:96px;}
+      .app{padding:12px;}
+      .row{flex-direction:column;}
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>Delivery Confirmation</h1>
+
+    <!-- IMPORTANT:
+         Put your logo file here in your repo:
+         assets/abuela-logo.png
+    -->
+    <div class="header">
+      <img src="assets/abuela-logo.png" alt="Abuela's Kitchen logo" class="logo" />
+      <h1>Delivery Confirmation</h1>
+    </div>
 
     <div class="card">
       <form id="deliveryForm">
@@ -184,13 +296,28 @@
           <option value="Bless">Bless</option>
         </select>
 
-        <label for="meals">Meals delivered</label>
-        <input id="meals" type="number" min="1" step="1" inputmode="numeric"
-               placeholder="How many meals were delivered?" required />
+        <label>Meals delivered</label>
+        <div class="row">
+          <div>
+            <div class="small-label">Breakfast</div>
+            <input id="breakfast" class="compact-input" type="number"
+                   min="0" step="1" inputmode="numeric" value="0" />
+          </div>
+          <div>
+            <div class="small-label">Lunch</div>
+            <input id="lunch" class="compact-input" type="number"
+                   min="0" step="1" inputmode="numeric" value="0" />
+          </div>
+          <div>
+            <div class="small-label">Snacks</div>
+            <input id="snacks" class="compact-input" type="number"
+                   min="0" step="1" inputmode="numeric" value="0" />
+          </div>
+        </div>
+        <div class="hint">Enter counts for each meal type. At least one value must be greater than zero.</div>
 
         <label for="recipientName">Manager / recipient name (dock)</label>
-        <input id="recipientName" type="text"
-               placeholder="Name of person receiving meals" required />
+        <input id="recipientName" type="text" placeholder="Name of person receiving meals" required />
 
         <div class="signature-box">
           <div class="sig-header">
@@ -216,6 +343,14 @@
       </div>
       <div id="log"></div>
     </div>
+
+    <footer class="footer">
+      <div style="text-align:center;color:var(--muted);font-size:0.95rem;line-height:1.4;">
+        <div>1917 NE 168th St • North Miami Beach, FL 33162</div>
+        <div>Tel: <a href="tel:+17864920625">786-492-0625</a> • Email: <a href="mailto:info@abuelaskitchenmiami.com">info@abuelaskitchenmiami.com</a></div>
+        <div>Website: <a href="https://www.abuelaskitchenmiami.com" target="_blank" rel="noopener">www.abuelaskitchenmiami.com</a></div>
+      </div>
+    </footer>
   </div>
 
   <script>
@@ -224,7 +359,9 @@
       const driverInput = document.getElementById("driverName");
       const dateInput = document.getElementById("date");
       const locationSelect = document.getElementById("location");
-      const mealsInput = document.getElementById("meals");
+      const breakfastInput = document.getElementById("breakfast");
+      const lunchInput = document.getElementById("lunch");
+      const snacksInput = document.getElementById("snacks");
       const recipientInput = document.getElementById("recipientName");
       const messageEl = document.getElementById("message");
       const logEl = document.getElementById("log");
@@ -235,22 +372,25 @@
       const clearSignatureBtn = document.getElementById("clearSignature");
       const ctx = canvas.getContext("2d");
 
-      const STORAGE_KEY = "abuela_delivery_confirmations_v3";
+      const STORAGE_KEY = "abuela_delivery_confirmations_v4";
 
       // =========================
       // OPTIONAL GOOGLE FORM SYNC
       // =========================
-      // 1) Create a Google Form with matching fields.
-      // 2) Find your formResponse URL and each entry id.
-      // 3) Paste here. Leave POST URL empty to disable.
-      const GOOGLE_FORM_POST_URL = ""; // e.g. "https://docs.google.com/forms/d/e/.../formResponse"
+      // 1) Create a Google Form with fields matching these.
+      // 2) Paste your formResponse URL and entry IDs.
+      // Leave POST URL empty to disable.
+      const GOOGLE_FORM_POST_URL = "";
       const GOOGLE_FORM_FIELDS = {
-        driver: "",    // e.g. "entry.123"
-        date: "",
-        location: "",
-        meals: "",
-        recipient: "",
-        savedAt: ""
+        driver:"",
+        date:"",
+        location:"",
+        breakfast:"",
+        lunch:"",
+        snacks:"",
+        total:"",
+        recipient:"",
+        savedAt:""
       };
 
       // Default date = today
@@ -258,7 +398,7 @@
       dateInput.value = today;
 
       // =========================
-      // SIGNATURE PAD (Pointer API)
+      // Signature pad (Pointer API)
       // =========================
       let drawing = false;
       let hasSignature = false;
@@ -267,30 +407,25 @@
         const rect = canvas.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
 
-        // Save current signature image (if any) so we can restore it after resizing.
-        const previousSignatureData = hasSignature ? canvas.toDataURL("image/png") : null;
-
         // Reset transform to avoid cumulative scaling
         ctx.setTransform(1,0,0,1,0,0);
 
-        // Resize canvas to match visual size * device pixel ratio
+        const prev = hasSignature ? canvas.toDataURL("image/png") : null;
+
         canvas.width = Math.max(1, Math.floor(rect.width * ratio));
         canvas.height = Math.max(1, Math.floor(rect.height * ratio));
 
-        // Scale drawing operations to map to CSS pixels
         ctx.scale(ratio, ratio);
 
-        if(previousSignatureData){
+        if(prev){
           const img = new Image();
           img.onload = () => {
-            // Clear and draw the previous signature scaled to the new size
             ctx.clearRect(0,0,rect.width,rect.height);
             ctx.drawImage(img, 0, 0, rect.width, rect.height);
             hasSignature = true;
           };
-          img.src = previousSignatureData;
-        }else{
-          // No previous signature: clear cleanly
+          img.src = prev;
+        } else {
           clearSignature();
         }
       }
@@ -343,7 +478,7 @@
       resizeCanvas();
 
       // =========================
-      // STORAGE
+      // Storage helpers
       // =========================
       function loadDeliveries(){
         try{
@@ -359,23 +494,6 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       }
 
-      function renderLog(){
-        const list = loadDeliveries();
-        if(!list.length){
-          logEl.innerHTML = '<p class="log-empty">No deliveries saved yet.</p>';
-          return;
-        }
-        logEl.innerHTML = list.map(d => `
-          <div class="log-entry">
-            <div class="log-header">${escapeHtml(d.date)} • ${escapeHtml(d.location)}</div>
-            <div>Meals delivered: <strong>${d.meals}</strong></div>
-            <div>Driver: ${escapeHtml(d.driver)}</div>
-            <div>Recipient: ${escapeHtml(d.recipient)}</div>
-            <div class="muted">Saved at ${escapeHtml(d.savedAt)} • Signature: ${d.signature ? "Yes" : "No"}</div>
-          </div>
-        `).join("");
-      }
-
       function escapeHtml(str){
         return String(str ?? "")
           .replaceAll("&","&amp;")
@@ -385,19 +503,72 @@
           .replaceAll("'","&#039;");
       }
 
+      function summarizeDeliveries(list){
+        return list.reduce((acc, d) => {
+          acc.count += 1;
+          acc.breakfast += Number(d.breakfast) || 0;
+          acc.lunch += Number(d.lunch) || 0;
+          acc.snacks += Number(d.snacks) || 0;
+          acc.total += Number(d.totalDelivered) || 0;
+          return acc;
+        }, {count:0, breakfast:0, lunch:0, snacks:0, total:0});
+      }
+
+      function renderLog(){
+        const list = loadDeliveries();
+        if(!list.length){
+          logEl.innerHTML = '<p class="log-empty">No deliveries saved yet.</p>';
+          return;
+        }
+
+        const totals = summarizeDeliveries(list);
+        const summary = `
+          <div class="summary-bar" aria-label="delivery totals">
+            <div class="summary-pill">Deliveries <span>${totals.count}</span></div>
+            <div class="summary-pill">Breakfast <span>${totals.breakfast}</span></div>
+            <div class="summary-pill">Lunch <span>${totals.lunch}</span></div>
+            <div class="summary-pill">Snacks <span>${totals.snacks}</span></div>
+            <div class="summary-pill">Total meals <span>${totals.total}</span></div>
+          </div>`;
+
+        logEl.innerHTML = summary + list.map((d, idx) => `
+          <div class="log-entry" data-index="${idx}">
+            <div class="log-header">${escapeHtml(d.date)} • ${escapeHtml(d.location)}</div>
+            <div>
+              Meals delivered:
+              <strong>${d.breakfast} / ${d.lunch} / ${d.snacks}</strong>
+              (B / L / S) — Total:
+              <strong>${d.totalDelivered}</strong>
+            </div>
+            <div>Driver: ${escapeHtml(d.driver)}</div>
+            <div>Recipient: ${escapeHtml(d.recipient)}</div>
+            <div class="muted">Saved at ${escapeHtml(d.savedAt)} • Signature: ${d.signature ? "Yes" : "No"}</div>
+            <div class="log-actions">
+              <button type="button" class="btn-soft btn-pill btn-xs view-signature" data-index="${idx}" ${d.signature ? "" : "disabled"}>${d.signature ? "View signature" : "No signature"}</button>
+              <button type="button" class="btn-soft btn-pill btn-xs delete-entry" data-index="${idx}">Delete</button>
+            </div>
+            ${d.signature ? `<img class="signature-preview" data-index="${idx}" alt="Saved signature for ${escapeHtml(d.recipient)}" src="${d.signature}" />` : ""}
+          </div>
+        `).join("");
+      }
+
       // =========================
-      // GOOGLE FORM SEND (optional)
+      // Google Form send (optional)
       // =========================
       function sendToGoogleForm(delivery){
         if(!GOOGLE_FORM_POST_URL) return;
 
         const fd = new FormData();
-        if(GOOGLE_FORM_FIELDS.driver) fd.append(GOOGLE_FORM_FIELDS.driver, delivery.driver);
-        if(GOOGLE_FORM_FIELDS.date) fd.append(GOOGLE_FORM_FIELDS.date, delivery.date);
+
+        if(GOOGLE_FORM_FIELDS.driver)   fd.append(GOOGLE_FORM_FIELDS.driver, delivery.driver);
+        if(GOOGLE_FORM_FIELDS.date)     fd.append(GOOGLE_FORM_FIELDS.date, delivery.date);
         if(GOOGLE_FORM_FIELDS.location) fd.append(GOOGLE_FORM_FIELDS.location, delivery.location);
-        if(GOOGLE_FORM_FIELDS.meals) fd.append(GOOGLE_FORM_FIELDS.meals, String(delivery.meals));
-        if(GOOGLE_FORM_FIELDS.recipient) fd.append(GOOGLE_FORM_FIELDS.recipient, delivery.recipient);
-        if(GOOGLE_FORM_FIELDS.savedAt) fd.append(GOOGLE_FORM_FIELDS.savedAt, delivery.savedAt);
+        if(GOOGLE_FORM_FIELDS.breakfast)fd.append(GOOGLE_FORM_FIELDS.breakfast, String(delivery.breakfast));
+        if(GOOGLE_FORM_FIELDS.lunch)    fd.append(GOOGLE_FORM_FIELDS.lunch, String(delivery.lunch));
+        if(GOOGLE_FORM_FIELDS.snacks)   fd.append(GOOGLE_FORM_FIELDS.snacks, String(delivery.snacks));
+        if(GOOGLE_FORM_FIELDS.total)    fd.append(GOOGLE_FORM_FIELDS.total, String(delivery.totalDelivered));
+        if(GOOGLE_FORM_FIELDS.recipient)fd.append(GOOGLE_FORM_FIELDS.recipient, delivery.recipient);
+        if(GOOGLE_FORM_FIELDS.savedAt)  fd.append(GOOGLE_FORM_FIELDS.savedAt, delivery.savedAt);
 
         fetch(GOOGLE_FORM_POST_URL, {
           method: "POST",
@@ -407,7 +578,7 @@
       }
 
       // =========================
-      // SUBMIT
+      // Submit
       // =========================
       form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -417,11 +588,22 @@
         const driver = driverInput.value.trim();
         const date = dateInput.value;
         const location = locationSelect.value;
-        const meals = Number(mealsInput.value);
-        const recipient = recipientInput.value.trim();
 
-        if(!driver || !date || !location || !recipient || !meals || meals <= 0){
-          messageEl.textContent = "Please fill in all fields correctly.";
+        const breakfast = Math.max(0, parseInt(breakfastInput.value || "0", 10));
+        const lunch = Math.max(0, parseInt(lunchInput.value || "0", 10));
+        const snacks = Math.max(0, parseInt(snacksInput.value || "0", 10));
+
+        const recipient = recipientInput.value.trim();
+        const totalDelivered = breakfast + lunch + snacks;
+
+        if(!driver || !date || !location || !recipient){
+          messageEl.textContent = "Please fill in driver, date, clinic, and recipient.";
+          messageEl.classList.add("error");
+          return;
+        }
+
+        if(totalDelivered <= 0){
+          messageEl.textContent = "Enter at least one delivered meal (Breakfast, Lunch, or Snacks).";
           messageEl.classList.add("error");
           return;
         }
@@ -434,15 +616,16 @@
 
         const now = new Date();
         const savedAt = now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-
-        // store signature as data URL for local proof
         const signature = canvas.toDataURL("image/png");
 
         const delivery = {
           driver,
           date,
           location,
-          meals,
+          breakfast,
+          lunch,
+          snacks,
+          totalDelivered,
           recipient,
           savedAt,
           signature
@@ -457,25 +640,52 @@
         messageEl.textContent = "Delivery saved ✅";
         messageEl.classList.add("success");
 
-        // Keep driver/date for speed; reset rest
-        mealsInput.value = "";
+        // Reset meal fields + recipient + signature; keep driver/date for speed
+        breakfastInput.value = "0";
+        lunchInput.value = "0";
+        snacksInput.value = "0";
         recipientInput.value = "";
         clearSignature();
-        mealsInput.focus();
+        breakfastInput.focus();
       });
 
       // =========================
-      // CLEAR LOG
+      // Clear log
       // =========================
       clearLogBtn.addEventListener("click", () => {
-        if(confirm("Clear all saved deliveries from this device?")){ 
+        if(confirm("Clear all saved deliveries from this device?")){
           saveDeliveries([]);
           renderLog();
         }
       });
 
+      logEl.addEventListener("click", (event) => {
+        const target = event.target;
+
+        if(target.classList.contains("view-signature")){
+          const idx = Number(target.dataset.index);
+          const img = logEl.querySelector(`img.signature-preview[data-index="${idx}"]`);
+          if(!img) return;
+          const isVisible = img.style.display === "block";
+          img.style.display = isVisible ? "none" : "block";
+          target.textContent = isVisible ? "View signature" : "Hide signature";
+          return;
+        }
+
+        if(target.classList.contains("delete-entry")){
+          const idx = Number(target.dataset.index);
+          if(Number.isNaN(idx)) return;
+          if(confirm("Delete this delivery from the log?")){
+            const list = loadDeliveries();
+            list.splice(idx, 1);
+            saveDeliveries(list);
+            renderLog();
+          }
+        }
+      });
+
       // =========================
-      // EXPORT CSV
+      // Export CSV
       // =========================
       exportCsvBtn.addEventListener("click", () => {
         const list = loadDeliveries();
@@ -484,13 +694,21 @@
           return;
         }
 
-        const headers = ["Date","TimeSaved","Driver","Location","MealsDelivered","Recipient","HasSignature"];
+        const headers = [
+          "Date","TimeSaved","Driver","Location",
+          "Breakfast","Lunch","Snacks","TotalDelivered",
+          "Recipient","HasSignature"
+        ];
+
         const rows = list.map(d => [
           d.date,
           d.savedAt,
           d.driver,
           d.location,
-          d.meals,
+          d.breakfast,
+          d.lunch,
+          d.snacks,
+          d.totalDelivered,
           d.recipient,
           d.signature ? "Yes" : "No"
         ]);
@@ -510,7 +728,7 @@
         URL.revokeObjectURL(url);
       });
 
-      // first render
+      // Initial render
       renderLog();
     })();
   </script>
